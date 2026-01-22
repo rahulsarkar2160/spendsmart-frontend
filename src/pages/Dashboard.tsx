@@ -241,7 +241,6 @@ const Dashboard = () => {
                         onSuccess={() => {
                             setShowForm(false);
                             dispatch(getExpenses({ page: 1, filters }));
-                            toast.success("Expense added");
                         }}
                     />
                 )}
