@@ -8,6 +8,8 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import api from "./api/axiosInstance";
+
 
 
 function App() {
@@ -16,33 +18,24 @@ function App() {
 
   useEffect(() => {
     if (!token) {
+      dispatch(setAuthReady());
       return;
     }
 
     const fetchMe = async () => {
       try {
-        const res = await fetch("/api/auth/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.ok) throw new Error("Unauthorized");
-
-        const data = await res.json();
+        const res = await api.get("/auth/me");
 
         dispatch(
           setCredentials({
             token,
-            user: data.user ?? data,
+            user: res.data, // axios response data
           })
         );
       } catch (err) {
         console.error("Auth hydration failed:", err);
-        dispatch(setAuthReady()); // 🔑 THIS UNFREEZES THE APP
-
+        dispatch(setAuthReady());
       }
-
     };
 
     fetchMe();
