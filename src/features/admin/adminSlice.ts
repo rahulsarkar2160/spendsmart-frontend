@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { RootState } from "../../store/store";
+import api from "../../api/axiosInstance";
+
 
 // 2️⃣ TYPES / INTERFACES
 interface AdminStats {
@@ -36,26 +38,16 @@ export const fetchAdminStats = createAsyncThunk<
     { state: RootState }
 >(
     "admin/fetchStats",
-    async (_, { getState, rejectWithValue }) => {
-        const token = getState().auth.token;
-
+    async (_, { rejectWithValue }) => {
         try {
-            const res = await fetch("/api/admin/stats", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            if (!res.ok) {
-                throw new Error("Failed to fetch admin stats");
-            }
-
-            return (await res.json()) as AdminStats;
-        } catch (err) {
+            const res = await api.get("/admin/stats");
+            return res.data;
+        } catch {
             return rejectWithValue("Unable to load admin stats");
         }
     }
 );
+
 
 export const fetchAdminUsers = createAsyncThunk<
     AdminUser[],
@@ -63,27 +55,20 @@ export const fetchAdminUsers = createAsyncThunk<
     { state: RootState }
 >(
     "admin/fetchUsers",
-    async (_, { getState, rejectWithValue }) => {
-        const token = getState().auth.token;
-
+    async (_, { rejectWithValue }) => {
         try {
-            const res = await fetch("/api/admin/users", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const res = await api.get("/admin/users");
 
-            if (!res.ok) {
-                throw new Error("Failed to fetch users");
-            }
-
-            const data = await res.json();
-            return Array.isArray(data) ? data : data.users ?? [];
+            // backend usually returns { users: [...] }
+            return Array.isArray(res.data)
+                ? res.data
+                : res.data.users ?? [];
         } catch {
             return rejectWithValue("Unable to load users");
         }
     }
 );
+
 
 export const deleteAdminUser = createAsyncThunk<
     string,
@@ -91,27 +76,16 @@ export const deleteAdminUser = createAsyncThunk<
     { state: RootState }
 >(
     "admin/deleteUser",
-    async (userId, { getState, rejectWithValue }) => {
-        const token = getState().auth.token;
-
+    async (userId, { rejectWithValue }) => {
         try {
-            const res = await fetch(`/api/admin/users/${userId}`, {
-                method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            if (!res.ok) {
-                throw new Error("Failed to delete user");
-            }
-
+            await api.delete(`/admin/users/${userId}`);
             return userId;
         } catch {
             return rejectWithValue("Unable to delete user");
         }
     }
 );
+
 
 
 const adminSlice = createSlice({
@@ -161,5 +135,4 @@ const adminSlice = createSlice({
 
 });
 
-// 5️⃣ EXPORT
 export default adminSlice.reducer;
