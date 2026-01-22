@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
 import { setCredentials, setAuthReady } from "./features/auth/authSlice";
@@ -29,11 +29,12 @@ function App() {
         dispatch(
           setCredentials({
             token,
-            user: res.data, // axios response data
+            user: res.data.user, // axios response data
           })
         );
       } catch (err) {
         console.error("Auth hydration failed:", err);
+      } finally {
         dispatch(setAuthReady());
       }
     };
@@ -64,7 +65,7 @@ function App() {
           }
         />
 
-        <Route path="*" element={<Login />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
   );
