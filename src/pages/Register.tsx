@@ -29,9 +29,15 @@ const Register = () => {
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <div className="bg-white p-8 rounded-lg shadow-md w-96">
-                <h2 className="text-2xl font-bold text-center mb-6">
-                    Create Account
-                </h2>
+                <div className="text-center mb-6">
+                    <h1 className="text-3xl font-extrabold text-blue-600">
+                        SpendSmart
+                    </h1>
+                    <p className="text-gray-500 mt-1">
+                        Create your account
+                    </p>
+                </div>
+
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
